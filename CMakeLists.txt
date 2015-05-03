@@ -24,8 +24,17 @@ configure_file("${PROJECT_SOURCE_DIR}/src/main.h.in" "${PROJECT_BINARY_DIR}/main
 #Add a location for a search path for headers
 include_directories("${PROJECT_BINARY_DIR}")
 
+#All the directories containing header files
+include_directories(
+"${PROJECT_SOURCE_DIR}/src/core/"
+"${PROJECT_SOURCE_DIR}/src/common/"
+)
+
 set(SOURCE_FILES
 src/main.cpp
+src/core/application.cpp
+src/common/out.cpp
+src/core/window.cpp
 )
 
 #Take the code and turn it into the executable

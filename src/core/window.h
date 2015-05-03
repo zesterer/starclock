@@ -24,7 +24,7 @@ namespace Starclock
 
 			public: Window();
 			public: ~Window();
-			public: bool run();
+			public: bool refresh();
 			public: void activate();
 		};
 	}

@@ -33,9 +33,11 @@ namespace Starclock
 			//The game loop
 			while (this->running)
 			{
+				//Render the scene
 				this->scene->render();
 
-				this->running = this->window->run();
+				//Refresh the window
+				this->running = this->window->refresh();
 			}
 		}
 	}

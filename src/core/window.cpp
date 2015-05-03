@@ -14,7 +14,8 @@ namespace Starclock
 			Common::Out::test(glfwInit(), "Initialising GLFW", true);
 
 			//Create the window
-			Common::Out::test((this->glfw_window = glfwCreateWindow(this->width, this->height, this->window_title.c_str(), NULL, NULL)), "Creating window", true);
+			this->glfw_window = glfwCreateWindow(this->width, this->height, this->window_title.c_str(), NULL, NULL);
+			Common::Out::test(this->glfw_window != NULL, "Creating window", true);
 		}
 
 		void Window::activate()
@@ -33,10 +34,8 @@ namespace Starclock
 			Common::Out::put("Closing Window");
 		}
 
-		bool Window::run()
+		bool Window::refresh()
 		{
-			//Render here
-
 			glfwSwapBuffers(this->glfw_window);
 
 			glfwPollEvents();

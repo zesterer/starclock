@@ -37,6 +37,7 @@ src/core/application.cpp
 src/common/out.cpp
 src/core/window.cpp
 src/render/scene.cpp
+src/render/camera.cpp
 )
 
 #Take the code and turn it into the executable

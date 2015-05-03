@@ -15,8 +15,6 @@ namespace Starclock
 
 			//Create the window
 			Common::Out::test((this->glfw_window = glfwCreateWindow(this->width, this->height, this->window_title.c_str(), NULL, NULL)), "Creating window", true);
-
-			this->activate();
 		}
 
 		void Window::activate()

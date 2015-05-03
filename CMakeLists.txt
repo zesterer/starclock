@@ -28,6 +28,7 @@ include_directories("${PROJECT_BINARY_DIR}")
 include_directories(
 "${PROJECT_SOURCE_DIR}/src/core/"
 "${PROJECT_SOURCE_DIR}/src/common/"
+"${PROJECT_SOURCE_DIR}/src/render/"
 )
 
 set(SOURCE_FILES
@@ -35,6 +36,7 @@ src/main.cpp
 src/core/application.cpp
 src/common/out.cpp
 src/core/window.cpp
+src/render/scene.cpp
 )
 
 #Take the code and turn it into the executable

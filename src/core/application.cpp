@@ -4,6 +4,7 @@
 //----LOCAL----
 #include "application.h"
 #include "../common/out.h"
+#include "../render/scene.h"
 
 namespace Starclock
 {
@@ -19,13 +20,23 @@ namespace Starclock
 
 			//Create the window
 			this->window = new Window();
+			this->window->activate();
+
+			//Create the scene
+			this->scene = new Render::Scene();
 		}
 
 		void Application::run()
 		{
 			Common::Out::put("Running Application");
 
-			while (this->window->run());
+			//The game loop
+			while (this->running)
+			{
+				this->scene->render();
+
+				this->running = this->window->run();
+			}
 		}
 	}
 }

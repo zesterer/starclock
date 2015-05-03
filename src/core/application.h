@@ -7,6 +7,7 @@
 
 //----LOCAL----
 #include "window.h"
+#include "../render/scene.h"
 
 using namespace std;
 
@@ -18,7 +19,10 @@ namespace Starclock
 		{
 			public: vector<string> args;
 
+			public: bool running = true; //Run until told otherwise
+
 			public: Window* window;
+			public: Render::Scene* scene;
 
 			public: Application(int argc, char* argv[]);
 			public: void run();

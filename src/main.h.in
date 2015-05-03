@@ -1,0 +1,8 @@
+#ifndef STARCLOCK_MAIN_H
+#define STARCLOCK_MAIN_H
+
+//Define the program version (Will be changed by cmake on compile)
+#define STARTCLOCK_VERSION_MAJOR @STARCLOCK_VERSION_MAJOR@
+#define STARTCLOCK_VERSION_MINOR @STARCLOCK_VERSION_MINOR@
+
+#endif // STARCLOCK_MAIN_H

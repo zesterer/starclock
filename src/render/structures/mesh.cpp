@@ -34,6 +34,7 @@ namespace Starclock
 				this->polygons.clear();
 
 				vector<VertexPos> tmp_pos;
+				vector<VertexCol> tmp_col;
 				vector<VertexTex> tmp_tex;
 				vector<VertexNorm> tmp_norm;
 
@@ -61,8 +62,14 @@ namespace Starclock
 					if (c_line[0] == 'v' && c_line[1] == ' ') //Deal with the vertex positions
 					{
 						VertexPos pos;
-						sscanf(c_line, "v %f %f %f", &pos.x, &pos.y, &pos.z);
+						VertexCol col;
+						bool matches = (sscanf(c_line, "v %f %f %f", &pos.x, &pos.y, &pos.z) == 3);
+
+						if (!matches) //It has colour too!
+							matches = (sscanf(c_line, "v %f %f %f %f %f %f", &pos.x, &pos.y, &pos.z, &col.r, &col.g, &col.b) == 6);
+
 						tmp_pos.push_back(pos);
+						tmp_col.push_back(col);
 					}
 					else if (c_line[0] == 'v' && c_line[1] == 't') //Deal with the vertex UV coordinates
 					{
@@ -109,6 +116,10 @@ namespace Starclock
 						poly.a.pos = tmp_pos[pos_index[0] - 1];
 						poly.b.pos = tmp_pos[pos_index[1] - 1];
 						poly.c.pos = tmp_pos[pos_index[2] - 1];
+
+						poly.a.col = tmp_col[pos_index[0] - 1];
+						poly.b.col = tmp_col[pos_index[1] - 1];
+						poly.c.col = tmp_col[pos_index[2] - 1];
 
 						poly.a.tex = tmp_tex[tex_index[0] - 1];
 						poly.b.tex = tmp_tex[tex_index[1] - 1];

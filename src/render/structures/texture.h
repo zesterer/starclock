@@ -28,6 +28,7 @@ namespace Starclock
 				public: unsigned int width, height;
 				public: unsigned char* file_data;
 				public: unsigned int data_pos; //The data position within the file data
+				public: bool clear_on_buffer = true;
 
 				public: Texture(Scene* scene, string id);
 				public: bool loadFromBMP(string filename);

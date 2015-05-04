@@ -164,6 +164,9 @@ namespace Starclock
 
 			void Mesh::buffer()
 			{
+				//Clear any existing memory before rebuffering
+				glDeleteVertexArrays(1, &this->gl_id);
+
 				//Create the vertex array id and bind it
 				glGenVertexArrays(1, &this->gl_id);
 				glBindVertexArray(this->gl_id);
@@ -177,6 +180,10 @@ namespace Starclock
 
 				//Pass the vertex position data to GL (the graphics card)
 				glBufferData(GL_ARRAY_BUFFER, this->polygon_number * sizeof(Polygon), &this->polygons[0], GL_STATIC_DRAW);
+
+				//We've buffered the data, so let's clear it
+				if (this->clear_on_buffer)
+					this->polygons.clear();
 			}
 		}
 	}

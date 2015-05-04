@@ -1,3 +1,7 @@
+//----LIBRARY----
+#define GLFW_INCLUDE_NONE
+#include "GLFW/glfw3.h"
+
 //----LOCAL----
 #include "window.h"
 #include "../common/out.h"

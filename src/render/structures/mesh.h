@@ -32,6 +32,7 @@ namespace Starclock
 				public: GLuint polygon_number;
 
             	public: vector<Polygon> polygons;
+            	public: bool clear_on_buffer = true;
 
 				public: Mesh(Scene* scene, string id);
             	public: bool loadFromOBJ(string filename);

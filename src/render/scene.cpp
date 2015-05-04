@@ -76,7 +76,7 @@ namespace Starclock
 			auto mickey = this->addEntityWithModel("mickey");
 			mickey->position = glm::vec3(5.0, 9.0, 0.0);
 			mickey->scale = glm::vec3(0.4, 0.4, 0.4);
-			mickey->rotation = glm::vec3(-M_PI / 5, M_PI / 2, 0.0);
+			mickey->rotation = glm::vec3(-M_PI / 5, M_PI / 2, 0.3);
 			mickey->update();
 			//*/
 		}

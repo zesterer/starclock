@@ -74,6 +74,9 @@ namespace Starclock
 
 			void Texture::buffer()
 			{
+				//Clear any existing memory before rebuffering
+				glDeleteTextures(1, &this->gl_id);
+
 				//Create the OpenGL texture
 				glGenTextures(1, &this->gl_id);
 
@@ -86,6 +89,10 @@ namespace Starclock
 				//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 				//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 				glGenerateMipmap(GL_TEXTURE_2D);
+
+				//We've buffered the data, so let's clear it
+				if (this->clear_on_buffer)
+					delete[] this->file_data;
 			}
 		}
 	}

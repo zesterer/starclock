@@ -9,7 +9,6 @@
 #include "glm/glm.hpp"
 #include "glm/vec3.hpp"
 #include "glm/mat4x4.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 
 //----LOCAL----
 #include "scene.h"
@@ -155,6 +154,9 @@ namespace Starclock
 				//Bind the texture buffer
 				glBindTexture(GL_TEXTURE_2D, texture->gl_id);
 
+				//Use the correct shaders program
+				glUseProgram(shaders->gl_id);
+
 				//Enable all the arrays
 				long offset = 0;
 				glEnableVertexAttribArray(0);
@@ -172,24 +174,12 @@ namespace Starclock
 				glEnableVertexAttribArray(3);
 				glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Structures::Vertex), (void*)offset);
 
-				glm::mat4 matrix = glm::mat4(1.0f);
+				//Find the projection matrix
+				glm::mat4 matrix = this->camera->matrix * entity->matrix;
 
-				//Apply entity transformations
-				matrix = glm::translate(matrix, entity->position);
-				matrix = glm::rotate(matrix, entity->rotation.z, glm::vec3(0.0, 0.0, 1.0)); //Roll
-				matrix = glm::rotate(matrix, entity->rotation.y, glm::vec3(1.0, 0.0, 0.0)); //Pitch
-				matrix = glm::rotate(matrix, entity->rotation.x, glm::vec3(0.0, 0.0, 1.0)); //Yaw
-				matrix = glm::scale(matrix, entity->scale);
-
-				glm::mat4 projection_matrix = glm::perspective(0.95f, 640.0f / 480.0f, 0.01f, 1000.0f);
-				matrix = projection_matrix * this->camera->matrix * matrix;
-
-				glUseProgram(shaders->gl_id);
-
+				//Find the uniform MVP matrix, then assign it
 				GLuint mvp_id = glGetUniformLocation(shaders->gl_id, "MVP");
 				glUniformMatrix4fv(mvp_id, 1, GL_FALSE, &matrix[0][0]);
-
-				//Common::Out::put("Rendered! with model: " + entity->model_id + ", mesh: " + model->mesh_id + ", texture: " + model->texture_id + ", shaders: " + model->shaders_id + ".");
 
 				//Draw the model
 				glDrawArrays(GL_TRIANGLES, 0, mesh->polygon_number * 3);

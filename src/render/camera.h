@@ -23,6 +23,9 @@ namespace Starclock
 			public: glm::mat4 matrix;
 
 			public: CameraMode mode = CameraMode::EULER;
+			public: float fov = 0.95;
+			public: float min_render = 0.01;
+			public: float max_render = 100;
 
 			public: Camera();
 			public: void update();

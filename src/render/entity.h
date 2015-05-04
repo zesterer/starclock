@@ -27,10 +27,13 @@ namespace Starclock
 			public: glm::vec3 scale;
 			public: glm::vec3 rotation;
 
+			public: glm::mat4 matrix;
+
 			public: Scene* scene;
 			public: string model_id;
 
 			public: Entity(Scene* scene);
+			public: void update();
 			public: void setModel(string model_id);
 		};
 	}

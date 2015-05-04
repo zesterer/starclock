@@ -51,22 +51,21 @@ namespace Starclock
 				//Keep reading file lines from the stream
 				while (getline(file, line))
 				{
-					//Verbose output
-					//Common::output(line);
-
 					//Some functions here only take c-style strings, so convert it for them
 					const char* c_line = line.c_str();
-					//Common::output(c_line);
 
 					//Parse the line
 					if (c_line[0] == 'v' && c_line[1] == ' ') //Deal with the vertex positions
 					{
 						VertexPos pos;
-						VertexCol col;
-						bool matches = (sscanf(c_line, "v %f %f %f", &pos.x, &pos.y, &pos.z) == 3);
+						VertexCol col = {1.0, 1.0, 1.0}; //Default to white, just in case there is no colour data
 
-						if (!matches) //It has colour too!
-							matches = (sscanf(c_line, "v %f %f %f %f %f %f", &pos.x, &pos.y, &pos.z, &col.r, &col.g, &col.b) == 6);
+						bool matches = (sscanf(c_line, "v %f %f %f %f %f %f", &pos.x, &pos.y, &pos.z, &col.r, &col.g, &col.b) == 6);
+
+						if (!matches) //It has no colour
+						{
+							matches = (sscanf(c_line, "v %f %f %f", &pos.x, &pos.y, &pos.z) == 3);
+						}
 
 						tmp_pos.push_back(pos);
 						tmp_col.push_back(col);
@@ -90,6 +89,8 @@ namespace Starclock
 						//The ids of all the data
 						unsigned int pos_index[3], tex_index[3], norm_index[3];
 
+						unsigned char has_parts = 0b00000000; //Got everything
+
 						//Scan the vertex strings
 						bool matches = (sscanf(c_line, "f %s %s %s", vertex[0], vertex[1], vertex[2]) == 3);
 
@@ -101,10 +102,25 @@ namespace Starclock
 						{
 							//Default to 3-format (with normals)
 							matches = (sscanf(vertex[n], "%d/%d/%d", &pos_index[n], &tex_index[n], &norm_index[n]) == 3);
+							if (matches)
+								has_parts = 0b11100000;
+
+
+							if (!matches)
+							{
+								matches = (sscanf(vertex[n], "%d//%d", &pos_index[n], &norm_index[n]) == 2);
+								if (matches)
+                                    has_parts = 0b10100000;
+							}
 
 							//...and just in case there aren't normals!
 							if (!matches)
+							{
 								matches = (sscanf(vertex[n], "%d/%d", &pos_index[n], &tex_index[n]) == 2);
+								if (matches)
+                                    has_parts = 0b11000000;
+							}
+
 
 							if (!Common::Out::test(matches, "Parsing file", false, true))
 								return false;
@@ -113,20 +129,26 @@ namespace Starclock
 						Polygon poly;
 
 						//Find the parts of the polygon
-						poly.a.pos = tmp_pos[pos_index[0] - 1];
-						poly.b.pos = tmp_pos[pos_index[1] - 1];
-						poly.c.pos = tmp_pos[pos_index[2] - 1];
+						if ((has_parts & 0b10000000) == 0b10000000) //If we have position data
+						{
+							poly.a.pos = tmp_pos[pos_index[0] - 1];
+							poly.b.pos = tmp_pos[pos_index[1] - 1];
+							poly.c.pos = tmp_pos[pos_index[2] - 1];
+						}
 
 						poly.a.col = tmp_col[pos_index[0] - 1];
 						poly.b.col = tmp_col[pos_index[1] - 1];
 						poly.c.col = tmp_col[pos_index[2] - 1];
 
-						poly.a.tex = tmp_tex[tex_index[0] - 1];
-						poly.b.tex = tmp_tex[tex_index[1] - 1];
-						poly.c.tex = tmp_tex[tex_index[2] - 1];
+						if ((has_parts & 0b01000000) == 0b01000000) //If we have texture data
+						{
+							poly.a.tex = tmp_tex[tex_index[0] - 1];
+							poly.b.tex = tmp_tex[tex_index[1] - 1];
+							poly.c.tex = tmp_tex[tex_index[2] - 1];
+						}
 
 						//We got normals!
-						if (matches == 3)
+						if ((has_parts & 0b00100000) == 0b00100000) //If we have normal data
 						{
 							poly.a.norm = tmp_norm[norm_index[0]];
 							poly.b.norm = tmp_norm[norm_index[1]];

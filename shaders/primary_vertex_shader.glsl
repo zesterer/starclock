@@ -27,7 +27,7 @@ void main()
 	lowp vec4 position = vec4(pos, 1);
 	gl_Position = MVP * position;
 
-	fragmentColor = vec3(position.x, position.y, position.z);//col;
+	fragmentColor = col;//col;
 
 	//Set the UV coordinates
 	UV = tex;

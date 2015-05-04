@@ -43,7 +43,7 @@ namespace Starclock
 			}
 			else
 			{
-				Out::put(label + ": success", OutputType::ERROR);
+				Out::put(label + ": failure", OutputType::ERROR);
 
 				if (critical)
 				{

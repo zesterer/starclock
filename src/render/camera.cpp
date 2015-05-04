@@ -15,6 +15,8 @@ namespace Starclock
 		{
 			this->position = glm::vec3(0.0, 0.0, 0.0);
 			this->rotation = glm::vec3(0.0, 0.0, 0.0);
+
+			this->update();
 		}
 
 		void Camera::update()

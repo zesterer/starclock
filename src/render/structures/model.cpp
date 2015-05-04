@@ -47,6 +47,7 @@ namespace Starclock
 				{
 					this->scene->getMesh(this->mesh_id)->buffer();
 					this->scene->getTexture(this->texture_id)->buffer();
+					//this->scene->getShaders(this->shaders_id)->buffer();
 				}
 
 				Common::Out::put("Buffered model with id '" + this->id + "'");

@@ -43,6 +43,7 @@ src/render/entity.cpp
 src/render/structures/model.cpp
 src/render/structures/mesh.cpp
 src/render/structures/texture.cpp
+src/render/structures/shaders.cpp
 )
 
 #Take the code and turn it into the executable

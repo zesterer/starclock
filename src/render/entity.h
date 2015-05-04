@@ -24,6 +24,7 @@ namespace Starclock
 		class Entity
 		{
 			public: glm::vec3 position;
+			public: glm::vec3 scale;
 			public: glm::vec3 rotation;
 
 			public: Scene* scene;

@@ -20,9 +20,9 @@ namespace Starclock
 		{
 			this->scene = scene;
 
-			this->position = glm::vec3(0.0, 5.0, 0.0);
-			this->scale = glm::vec3(0.0005, 0.0005, 0.0005);
-			this->rotation = glm::vec3(M_PI / 5, M_PI / 2, 0.0);
+			this->position = glm::vec3(0.0, 0.0, 0.0);
+			this->scale = glm::vec3(1.0, 1.0, 1.0);
+			this->rotation = glm::vec3(0.0, 0.0, 0.0);
 
 			//Update the transformation matrix
 			this->update();

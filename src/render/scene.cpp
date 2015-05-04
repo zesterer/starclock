@@ -32,22 +32,73 @@ namespace Starclock
 			Common::Out::put("Initialising GLbinding");
 			glbinding::Binding::initialize();
 
-			glEnable(GL_DEPTH_TEST);
-			glDepthFunc(GL_LESS);
+			this->enable();
 
 			//Create the camera
 			this->camera = new Camera();
 
 			///* Testing
-			this->addMeshFromOBJ("bowser", "../bowser.obj");
-			this->addTextureFromBMP("bowser", "../bowser.bmp");
 			this->addShadersFromFiles("primary", "../shaders/primary_vertex_shader.glsl", "../shaders/primary_fragment_shader.glsl");
-			Structures::Model* model = this->addModelFromMeshTexture("bowser", "bowser", "bowser", "primary");
-			model->buffer();
-			Entity entity(this);
-			entity.setModel("bowser");
-			this->entities.push_back(entity);
+
+			this->addMeshFromOBJ("bowser", "../bowser.obj");
+			this->addMeshFromOBJ("flower", "../flower.obj");
+			this->addMeshFromOBJ("floor", "../floor.obj");
+			this->addMeshFromOBJ("mickey", "../mickey.obj");
+
+			this->addTextureFromBMP("bowser", "../bowser.bmp");
+			this->addTextureFromBMP("fire", "../fire.bmp");
+			this->addTextureFromBMP("grass", "../grass.bmp");
+			this->addTextureFromBMP("mickey", "../mickey.bmp");
+
+			this->addModelFromMeshTexture("bowser", "bowser", "bowser", "primary");
+			this->addModelFromMeshTexture("flower", "flower", "fire", "primary");
+			this->addModelFromMeshTexture("floor", "floor", "grass", "primary");
+			this->addModelFromMeshTexture("mickey", "mickey", "mickey", "primary");
+
+			auto bowser = this->addEntityWithModel("bowser");
+			bowser->position = glm::vec3(0.0, 5.0, 0.0);
+			bowser->scale = glm::vec3(0.0005, 0.0005, 0.0005);
+			bowser->rotation = glm::vec3(M_PI / 5, M_PI / 2, 0.0);
+			bowser->update();
+
+			auto flower = this->addEntityWithModel("flower");
+			flower->position = glm::vec3(-1.5, 4.0, 0.0);
+			flower->scale = glm::vec3(0.01, 0.01, 0.01);
+			flower->rotation = glm::vec3(M_PI / 12, M_PI / 2, 0.0);
+			flower->update();
+
+			auto floor = this->addEntityWithModel("floor");
+			floor->position = glm::vec3(0.0, 0.0, 0.0);
+			floor->scale = glm::vec3(20.0, 20.0, 20.0);
+			floor->rotation = glm::vec3(0.0, M_PI / 2, 0.0);
+			floor->update();
+
+			auto mickey = this->addEntityWithModel("mickey");
+			mickey->position = glm::vec3(5.0, 9.0, 0.0);
+			mickey->scale = glm::vec3(0.4, 0.4, 0.4);
+			mickey->rotation = glm::vec3(-M_PI / 5, M_PI / 2, 0.0);
+			mickey->update();
 			//*/
+		}
+
+		void Scene::enable()
+		{
+			Common::Out::put("Enabling Scene");
+
+			//Enable backface culling
+			glEnable(GL_CULL_FACE);
+
+			//Enable the depth buffer
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LESS);
+		}
+
+		Entity* Scene::addEntityWithModel(string model_id)
+		{
+			Entity entity(this);
+			entity.setModel(model_id);
+			this->entities.push_back(entity);
+			return &this->entities.back();
 		}
 
 		Structures::Model* Scene::addModelFromMeshTexture(string id, string mesh_id, string texture_id, string shader_id)
@@ -137,6 +188,12 @@ namespace Starclock
 
 			glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			for (unsigned long count = 0; count < this->models.size(); count ++)
+			{
+				if (!this->models[count].buffered)
+					this->models[count].buffer();
+			}
 
 			//Render each entity
 			for (unsigned long count = 0; count < this->entities.size(); count ++)

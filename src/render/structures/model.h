@@ -26,6 +26,7 @@ namespace Starclock
 			{
 				public: string id;
 				public: Scene* scene;
+				public: bool buffered = false;
 
 				public: string mesh_id;
 				public: string texture_id;

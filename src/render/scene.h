@@ -36,8 +36,10 @@ namespace Starclock
 			public: vector<Structures::Shaders> shaders;
 
 			public: Scene();
+			public: void enable();
 			public: void update();
 			public: void render();
+			public: Entity* addEntityWithModel(string model_id);
 			public: Structures::Model* addModelFromMeshTexture(string id, string mesh_id, string texture_id, string shader_id);
 			public: Structures::Mesh* addMeshFromOBJ(string id, string filename);
 			public: Structures::Texture* addTextureFromBMP(string id, string filename);

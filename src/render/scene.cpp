@@ -177,6 +177,9 @@ namespace Starclock
 
 		void Scene::update()
 		{
+			//Increment the tick
+			this->tick += 1;
+
 			//Update the camera logic
 			this->camera->update();
 		}
@@ -231,12 +234,18 @@ namespace Starclock
 				glEnableVertexAttribArray(3);
 				glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Structures::Vertex), (void*)offset);
 
-				//Find the projection matrix
-				glm::mat4 matrix = this->camera->matrix * entity->matrix;
+				//Find the uniform camera matrix, then assign it
+				GLuint camera_matrix_id = glGetUniformLocation(shaders->gl_id, "CAMERA_MATRIX");
+				glUniformMatrix4fv(camera_matrix_id, 1, GL_FALSE, &this->camera->matrix[0][0]);
 
-				//Find the uniform MVP matrix, then assign it
-				GLuint mvp_id = glGetUniformLocation(shaders->gl_id, "MVP");
-				glUniformMatrix4fv(mvp_id, 1, GL_FALSE, &matrix[0][0]);
+				//Find the uniform model vector, then assign it
+				GLuint model_matrix_id = glGetUniformLocation(shaders->gl_id, "MODEL_MATRIX");
+				glUniformMatrix4fv(model_matrix_id, 1, GL_FALSE, &entity->matrix[0][0]);
+
+				//Find the uniform lighting vector, then assign it
+				GLuint light_vector_id = glGetUniformLocation(shaders->gl_id, "LIGHT_VECTOR");
+				glm::vec3 light_vector(sin((float)this->tick / 100), cos((float)this->tick / 100), -0.5);
+				glUniform3fv(light_vector_id, 1, &light_vector[0]);
 
 				//Draw the model
 				glDrawArrays(GL_TRIANGLES, 0, mesh->polygon_number * 3);

@@ -28,6 +28,7 @@ namespace Starclock
 		class Scene
 		{
 			public: Camera* camera;
+			public: unsigned long long tick = 0;
 
 			public: vector<Entity> entities;
 			public: vector<Structures::Model> models;

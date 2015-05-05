@@ -1,5 +1,6 @@
 //----STANDARD----
 #include "string"
+#include "math.h"
 
 //----LIBRARY----
 #define GLFW_INCLUDE_NONE
@@ -9,6 +10,8 @@
 #include "application.h"
 #include "../common/out.h"
 #include "../render/scene.h"
+
+using namespace std;
 
 namespace Starclock
 {
@@ -39,13 +42,25 @@ namespace Starclock
 			{
 				///*Testing - Check keyboard
 				if (glfwGetKey(this->window->glfw_window, GLFW_KEY_D) == GLFW_PRESS)
-					this->scene->camera->position.x += 0.05;
+				{
+					this->scene->camera->position.x += 0.05 * sin(this->scene->camera->rotation.x + M_PI / 2);
+					this->scene->camera->position.y += 0.05 * cos(this->scene->camera->rotation.x + M_PI / 2);
+				}
 				if (glfwGetKey(this->window->glfw_window, GLFW_KEY_A) == GLFW_PRESS)
-					this->scene->camera->position.x -= 0.05;
+				{
+					this->scene->camera->position.x += 0.05 * sin(this->scene->camera->rotation.x - M_PI / 2);
+					this->scene->camera->position.y += 0.05 * cos(this->scene->camera->rotation.x - M_PI / 2);
+				}
 				if (glfwGetKey(this->window->glfw_window, GLFW_KEY_W) == GLFW_PRESS)
-					this->scene->camera->position.y += 0.05;
+				{
+					this->scene->camera->position.x += 0.05 * sin(this->scene->camera->rotation.x);
+					this->scene->camera->position.y += 0.05 * cos(this->scene->camera->rotation.x);
+				}
 				if (glfwGetKey(this->window->glfw_window, GLFW_KEY_S) == GLFW_PRESS)
-					this->scene->camera->position.y -= 0.05;
+				{
+					this->scene->camera->position.x += 0.05 * sin(this->scene->camera->rotation.x + M_PI);
+					this->scene->camera->position.y += 0.05 * cos(this->scene->camera->rotation.x + M_PI);
+				}
 				if (glfwGetKey(this->window->glfw_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 					this->scene->camera->rotation.x += 0.02;
 				if (glfwGetKey(this->window->glfw_window, GLFW_KEY_LEFT) == GLFW_PRESS)

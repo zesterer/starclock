@@ -9,6 +9,12 @@
 #include "glbinding/gl/gl.h"
 #include "glbinding/Binding.h"
 
+#include "glm/glm.hpp"
+#include "glm/vec3.hpp"
+#include "glm/mat4x4.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/detail/func_geometric.hpp"
+
 //----LOCAL----
 #include "mesh.h"
 #include "geometry.h"
@@ -72,13 +78,13 @@ namespace Starclock
 					}
 					else if (c_line[0] == 'v' && c_line[1] == 't') //Deal with the vertex UV coordinates
 					{
-						VertexTex tex;
+						VertexTex tex = {-1.0, -1.0};
 						sscanf(c_line, "vt %f %f", &tex.x, &tex.y);
 						tmp_tex.push_back(tex);
 					}
 					else if (c_line[0] == 'v' && c_line[1] == 'n') //Deal with the vertex UV coordinates
 					{
-						VertexNorm norm;
+						VertexNorm norm = {0.0, 0.0, 0.0}; //Default to a non-existent normal
 						sscanf(c_line, "vn %f %f %f", &norm.i, &norm.j, &norm.k);
 						tmp_norm.push_back(norm);
 					}
@@ -148,11 +154,20 @@ namespace Starclock
 						}
 
 						//We got normals!
-						if ((has_parts & 0b00100000) == 0b00100000) //If we have normal data
+						if ((has_parts & 0b00100000) == 0b00100000 || true) //If we have normal data
 						{
-							poly.a.norm = tmp_norm[norm_index[0]];
-							poly.b.norm = tmp_norm[norm_index[1]];
-							poly.c.norm = tmp_norm[norm_index[2]];
+							//poly.a.norm = tmp_norm[norm_index[0]];
+							//poly.b.norm = tmp_norm[norm_index[1]];
+							//poly.c.norm = tmp_norm[norm_index[2]];
+
+							glm::vec3 a = glm::vec3(tmp_pos[pos_index[0] - 1].x, tmp_pos[pos_index[0] - 1].y, tmp_pos[pos_index[0] - 1].z);
+							glm::vec3 b = glm::vec3(tmp_pos[pos_index[1] - 1].x, tmp_pos[pos_index[1] - 1].y, tmp_pos[pos_index[1] - 1].z);
+							glm::vec3 c = glm::vec3(tmp_pos[pos_index[2] - 1].x, tmp_pos[pos_index[2] - 1].y, tmp_pos[pos_index[2] - 1].z);
+							glm::vec3 n0 = glm::cross(b - a, c - a);
+							n0 /= glm::length(n0);
+							poly.a.norm = {n0.x, n0.y, n0.z};
+							poly.b.norm = {n0.x, n0.y, n0.z};
+							poly.c.norm = {n0.x, n0.y, n0.z};
 						}
 
 						this->polygons.push_back(poly);

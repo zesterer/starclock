@@ -31,7 +31,7 @@ namespace Starclock
 			//The position
 			this->matrix = glm::translate(this->matrix, glm::vec3(-this->position.x, -this->position.y, -this->position.z));
 			//Perspective / projection
-			this->matrix = glm::perspective(this->fov, 640.0f / 480.0f, this->min_render, this->max_render) * this->matrix;
+			this->perspective_matrix = glm::perspective(this->fov, 640.0f / 480.0f, this->min_render, this->max_render);
 		}
 	}
 }

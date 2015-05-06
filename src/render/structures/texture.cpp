@@ -74,8 +74,9 @@ namespace Starclock
 
 			void Texture::buffer()
 			{
+				//NOT WORKING
 				//Clear any existing memory before rebuffering
-				glDeleteTextures(1, &this->gl_id);
+				//glDeleteTextures(1, &this->gl_id);
 
 				//Create the OpenGL texture
 				glGenTextures(1, &this->gl_id);

@@ -21,6 +21,7 @@ namespace Starclock
 			public: glm::vec3 position;
 			public: glm::vec3 rotation;
 			public: glm::mat4 matrix;
+			public: glm::mat4 perspective_matrix;
 
 			public: CameraMode mode = CameraMode::EULER;
 			public: float fov = 0.95;

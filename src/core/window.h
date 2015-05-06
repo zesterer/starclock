@@ -16,8 +16,8 @@ namespace Starclock
 	{
 		class Window
 		{
-			public: unsigned int width = 640;
-			public: unsigned int height = 480;
+			public: unsigned int width = 640 / 1;
+			public: unsigned int height = 480 / 1;
 			public: string window_title = "Starclock";
 
 			public: GLFWwindow* glfw_window;

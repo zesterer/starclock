@@ -43,6 +43,8 @@ namespace Starclock
 				vector<VertexCol> tmp_col;
 				vector<VertexTex> tmp_tex;
 				vector<VertexNorm> tmp_norm;
+				vector<Face> tmp_face;
+				vector<VertexNorm> new_norms;
 
 				//Open the file
 				ifstream file (filename);
@@ -93,7 +95,7 @@ namespace Starclock
 						//The actual string
 						char vertex[3][20];
 						//The ids of all the data
-						unsigned int pos_index[3], tex_index[3], norm_index[3];
+						int pos_index[3], tex_index[3], norm_index[3];
 
 						unsigned char has_parts = 0b00000000; //Got everything
 
@@ -132,46 +134,119 @@ namespace Starclock
 								return false;
 						}
 
-						Polygon poly;
+						for (int x = 0; x < 3; x ++)
+							if (pos_index[x] < 0) pos_index[x] *= -1;
 
-						//Find the parts of the polygon
-						if ((has_parts & 0b10000000) == 0b10000000) //If we have position data
+						for (int x = 0; x < 3; x ++)
+							if (tex_index[x] < 0) tex_index[x] *= -1;
+
+						for (int x = 0; x < 3; x ++)
+							if (norm_index[x] < 0) norm_index[x] *= -1;
+
+						Face face;
+
+						face.a_pos = pos_index[0];
+						face.a_col = pos_index[0];
+						face.a_tex = tex_index[0];
+						face.a_norm = norm_index[0];
+
+						face.b_pos = pos_index[1];
+						face.b_col = pos_index[1];
+						face.b_tex = tex_index[1];
+						face.b_norm = norm_index[1];
+
+						face.c_pos = pos_index[2];
+						face.c_col = pos_index[2];
+						face.c_tex = tex_index[2];
+						face.c_norm = norm_index[2];
+
+						face.has_parts = has_parts;
+
+						tmp_face.push_back(face);
+					}
+				}
+
+				for (unsigned long pos_id = 0; pos_id < tmp_pos.size(); pos_id ++)
+				{
+					//glm::vec3 pos = glm::vec3(tmp_pos[pos_id].x, tmp_pos[pos_id].y, tmp_pos[pos_id].z);
+
+					glm::vec3 net = glm::vec3(0.0, 0.0, 0.0);
+					float total = 0;
+
+					for (unsigned long face_id = 0; face_id < tmp_face.size(); face_id ++)
+					{
+						Face face = tmp_face[face_id];
+
+						if (face.a_pos == pos_id || face.b_pos == pos_id || face.c_pos == pos_id)
 						{
-							poly.a.pos = tmp_pos[pos_index[0] - 1];
-							poly.b.pos = tmp_pos[pos_index[1] - 1];
-							poly.c.pos = tmp_pos[pos_index[2] - 1];
-						}
-
-						poly.a.col = tmp_col[pos_index[0] - 1];
-						poly.b.col = tmp_col[pos_index[1] - 1];
-						poly.c.col = tmp_col[pos_index[2] - 1];
-
-						if ((has_parts & 0b01000000) == 0b01000000) //If we have texture data
-						{
-							poly.a.tex = tmp_tex[tex_index[0] - 1];
-							poly.b.tex = tmp_tex[tex_index[1] - 1];
-							poly.c.tex = tmp_tex[tex_index[2] - 1];
-						}
-
-						//We got normals!
-						if ((has_parts & 0b00100000) == 0b00100000 || true) //If we have normal data
-						{
-							//poly.a.norm = tmp_norm[norm_index[0]];
-							//poly.b.norm = tmp_norm[norm_index[1]];
-							//poly.c.norm = tmp_norm[norm_index[2]];
-
-							glm::vec3 a = glm::vec3(tmp_pos[pos_index[0] - 1].x, tmp_pos[pos_index[0] - 1].y, tmp_pos[pos_index[0] - 1].z);
-							glm::vec3 b = glm::vec3(tmp_pos[pos_index[1] - 1].x, tmp_pos[pos_index[1] - 1].y, tmp_pos[pos_index[1] - 1].z);
-							glm::vec3 c = glm::vec3(tmp_pos[pos_index[2] - 1].x, tmp_pos[pos_index[2] - 1].y, tmp_pos[pos_index[2] - 1].z);
+							//Calculate normal
+							glm::vec3 a = glm::vec3(tmp_pos[face.a_pos - 1].x, tmp_pos[face.a_pos - 1].y, tmp_pos[face.a_pos - 1].z);
+							glm::vec3 b = glm::vec3(tmp_pos[face.b_pos - 1].x, tmp_pos[face.b_pos - 1].y, tmp_pos[face.b_pos - 1].z);
+							glm::vec3 c = glm::vec3(tmp_pos[face.c_pos - 1].x, tmp_pos[face.c_pos - 1].y, tmp_pos[face.c_pos - 1].z);
 							glm::vec3 n0 = glm::cross(b - a, c - a);
 							n0 /= glm::length(n0);
-							poly.a.norm = {n0.x, n0.y, n0.z};
-							poly.b.norm = {n0.x, n0.y, n0.z};
-							poly.c.norm = {n0.x, n0.y, n0.z};
-						}
+							net += glm::vec3(n0.x, n0.y, n0.z);
 
-						this->polygons.push_back(poly);
+							total += 1.0;
+						}
 					}
+
+					net /= total;
+
+					VertexNorm n1 = {net.x, net.y, net.z};
+
+					new_norms.push_back(n1);
+				}
+
+				for (unsigned long face_id = 0; face_id < tmp_face.size(); face_id ++)
+				{
+					Face face = tmp_face[face_id];
+
+					Polygon poly;
+
+					//Find the parts of the polygon
+					if ((face.has_parts & 0b10000000) == 0b10000000) //If we have position data
+					{
+						poly.a.pos = tmp_pos[face.a_pos - 1];
+						poly.b.pos = tmp_pos[face.b_pos - 1];
+						poly.c.pos = tmp_pos[face.c_pos - 1];
+					}
+
+					poly.a.col = tmp_col[face.a_col - 1];
+					poly.b.col = tmp_col[face.b_col - 1];
+					poly.c.col = tmp_col[face.c_col - 1];
+
+					if ((face.has_parts & 0b01000000) == 0b01000000) //If we have texture data
+					{
+						poly.a.tex = tmp_tex[face.a_tex - 1];
+						poly.b.tex = tmp_tex[face.b_tex - 1];
+						poly.c.tex = tmp_tex[face.c_tex - 1];
+					}
+						//We got normals!
+					if ((face.has_parts & 0b00100000) == 0b00100000 && true) //If we have normal data
+					{
+						//poly.a.norm = new_norms[face.a_pos - 1];
+						//poly.b.norm = new_norms[face.b_pos - 1];
+						//poly.c.norm = new_norms[face.c_pos - 1];
+
+						//Set to default normals
+						poly.a.norm = tmp_norm[face.a_norm - 1];
+						poly.b.norm = tmp_norm[face.b_norm - 1];
+						poly.c.norm = tmp_norm[face.c_norm - 1];
+					}
+					else //Otherwise, calculate out own normals (not smoothed)
+					{
+						glm::vec3 a = glm::vec3(tmp_pos[face.a_pos - 1].x, tmp_pos[face.a_pos - 1].y, tmp_pos[face.a_pos - 1].z);
+						glm::vec3 b = glm::vec3(tmp_pos[face.b_pos - 1].x, tmp_pos[face.b_pos - 1].y, tmp_pos[face.b_pos - 1].z);
+						glm::vec3 c = glm::vec3(tmp_pos[face.c_pos - 1].x, tmp_pos[face.c_pos - 1].y, tmp_pos[face.c_pos - 1].z);
+						glm::vec3 n0 = glm::cross(b - a, c - a);
+						n0 /= glm::length(n0);
+						poly.a.norm = {n0.x, n0.y, n0.z};
+						poly.b.norm = {n0.x, n0.y, n0.z};
+						poly.c.norm = {n0.x, n0.y, n0.z};
+					}
+
+					this->polygons.push_back(poly);
 				}
 
 				return true;

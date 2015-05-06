@@ -61,6 +61,11 @@ namespace Starclock
 					this->scene->camera->position.x += 0.05 * sin(this->scene->camera->rotation.x + M_PI);
 					this->scene->camera->position.y += 0.05 * cos(this->scene->camera->rotation.x + M_PI);
 				}
+				if (glfwGetKey(this->window->glfw_window, GLFW_KEY_M) == GLFW_PRESS)
+					this->scene->camera->position.z += 0.03;
+				if (glfwGetKey(this->window->glfw_window, GLFW_KEY_N) == GLFW_PRESS)
+					this->scene->camera->position.z -= 0.03;
+
 				if (glfwGetKey(this->window->glfw_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 					this->scene->camera->rotation.x += 0.03;
 				if (glfwGetKey(this->window->glfw_window, GLFW_KEY_LEFT) == GLFW_PRESS)
@@ -69,6 +74,10 @@ namespace Starclock
 					this->scene->camera->rotation.y += 0.03;
 				if (glfwGetKey(this->window->glfw_window, GLFW_KEY_DOWN) == GLFW_PRESS)
 					this->scene->camera->rotation.y -= 0.03;
+				if (glfwGetKey(this->window->glfw_window, GLFW_KEY_J) == GLFW_PRESS)
+					this->scene->camera->rotation.z -= 0.03;
+				if (glfwGetKey(this->window->glfw_window, GLFW_KEY_L) == GLFW_PRESS)
+					this->scene->camera->rotation.z += 0.03;
 				//*/
 
 				//Render the scene

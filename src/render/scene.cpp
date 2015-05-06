@@ -88,9 +88,9 @@ namespace Starclock
 			mickey->rotation = glm::vec3(-M_PI / 5, M_PI / 2, 0.0);
 			mickey->update();
 
-			for (int x = 0; x < 30; x ++)
+			for (int x = 0; x < 10; x ++)
 			{
-				for (int y = 0; y < 30; y ++)
+				for (int y = 0; y < 10; y ++)
 				{
 					mickey = this->addEntityWithModel("yoshi");
 					mickey->position = glm::vec3(9.0 + 3.0 * (float)x, 9.0 + 3.0 * (float)y, 2.0);
@@ -256,22 +256,17 @@ namespace Starclock
 				//Use the correct shaders program
 				glUseProgram(shaders->gl_id);
 
-				//Enable all the arrays
-				long offset = 0;
-				glEnableVertexAttribArray(0);
-				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Structures::Vertex), (void*)offset);
-				offset += sizeof(Structures::VertexPos);
+				//What is the buffer array composed of?
+				int length[] = {sizeof(Structures::VertexPos), sizeof(Structures::VertexCol), sizeof(Structures::VertexTex), sizeof(Structures::VertexNorm)};
 
-				glEnableVertexAttribArray(1);
-				glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Structures::Vertex), (void*)offset);
-				offset += sizeof(Structures::VertexCol);
-
-				glEnableVertexAttribArray(2);
-				glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Structures::Vertex), (void*)offset);
-				offset += sizeof(Structures::VertexTex);
-
-				glEnableVertexAttribArray(3);
-				glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Structures::Vertex), (void*)offset);
+				//Tell the shaders what different parts of the buffer mean using the above array
+				GLuint offset = 0;
+				for (int array_id = 0; array_id < 4; array_id ++)
+				{
+					glEnableVertexAttribArray(array_id);
+					glVertexAttribPointer(array_id, length[array_id] / sizeof(GLfloat), GL_FLOAT, GL_FALSE, sizeof(Structures::Vertex), (void*)offset);
+					offset += length[array_id];
+				}
 
 				//Find the uniform camera matrix, then assign it
 				GLuint perspective_matrix_id = glGetUniformLocation(shaders->gl_id, "PERSPECTIVE_MATRIX");
@@ -288,7 +283,7 @@ namespace Starclock
 				//Find the uniform lighting vector, then assign it
 				GLuint light_vector_id = glGetUniformLocation(shaders->gl_id, "LIGHT_VECTOR");
 				glm::vec4 light_vector(sin((float)this->tick / 100), cos((float)this->tick / 100), -0.5, 0.25);
-				light_vector = glm::vec4(1.0, 1.0, -0.5, 0.15);
+				light_vector = glm::vec4(1.0, 1.0, -0.5, 0.35);
 				glUniform4fv(light_vector_id, 1, &light_vector[0]);
 
 				//Draw the model

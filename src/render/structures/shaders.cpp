@@ -46,7 +46,7 @@ namespace Starclock
 				{
 					std::string Line = "";
 					while(getline(VertexShaderStream, Line))
-						VertexShaderCode += "\n" + Line;
+						VertexShaderCode += Line + "\n";
 					VertexShaderStream.close();
 				}
 
@@ -57,7 +57,7 @@ namespace Starclock
 				{
 					std::string Line = "";
 					while(getline(FragmentShaderStream, Line))
-						FragmentShaderCode += "\n" + Line;
+						FragmentShaderCode += Line + "\n";
 					FragmentShaderStream.close();
 				}
 

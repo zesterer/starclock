@@ -118,7 +118,7 @@ namespace Starclock
 							{
 								matches = (sscanf(vertex[n], "%d//%d", &pos_index[n], &norm_index[n]) == 2);
 								if (matches)
-                                    has_parts = 0b10100000;
+									has_parts = 0b10100000;
 							}
 
 							//...and just in case there aren't normals!
@@ -126,7 +126,7 @@ namespace Starclock
 							{
 								matches = (sscanf(vertex[n], "%d/%d", &pos_index[n], &tex_index[n]) == 2);
 								if (matches)
-                                    has_parts = 0b11000000;
+									has_parts = 0b11000000;
 							}
 
 

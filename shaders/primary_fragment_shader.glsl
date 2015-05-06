@@ -73,7 +73,7 @@ void main()
 	//diffuse = floor(diffuse * parts) / parts + 0.5 / parts;
 	//specular = floor(specular * parts) / parts + 0.5 / parts;
 
-	color = tex * frag_col * (diffuse + spotlight) + specular;
+	color = tex * frag_col * (diffuse + spotlight) + (0.2 * tex + 0.8) * specular;
 
 	//color = floor(color * parts) / parts + 0.5 / parts;
 }

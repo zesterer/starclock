@@ -38,7 +38,7 @@ namespace Starclock
 			this->camera = new Camera();
 
 			///* Testing
-			this->addShadersFromFiles("primary", "../shaders/primary_vertex_shader.glsl", "../shaders/primary_fragment_shader.glsl");
+			this->addShadersFromFiles("primary", "../shaders/primary_vertex_shader.glsl", "../shaders/fragment_shader.glsl");
 
 			this->addMeshFromOBJ("bowser", "../bowser.obj");
 			this->addMeshFromOBJ("flower", "../flower.obj");
@@ -88,9 +88,9 @@ namespace Starclock
 			mickey->rotation = glm::vec3(-M_PI / 5, M_PI / 2, 0.0);
 			mickey->update();
 
-			for (int x = 0; x < 10; x ++)
+			for (int x = 0; x < 5; x ++)
 			{
-				for (int y = 0; y < 10; y ++)
+				for (int y = 0; y < 5; y ++)
 				{
 					mickey = this->addEntityWithModel("yoshi");
 					mickey->position = glm::vec3(9.0 + 3.0 * (float)x, 9.0 + 3.0 * (float)y, 2.0);
@@ -261,10 +261,10 @@ namespace Starclock
 
 				//Tell the shaders what different parts of the buffer mean using the above array
 				GLuint offset = 0;
-				for (int array_id = 0; array_id < 4; array_id ++)
+				for (GLuint array_id = 0; array_id < 4; array_id ++)
 				{
 					glEnableVertexAttribArray(array_id);
-					glVertexAttribPointer(array_id, length[array_id] / sizeof(GLfloat), GL_FLOAT, GL_FALSE, sizeof(Structures::Vertex), (void*)offset);
+					glVertexAttribPointer(array_id, length[array_id] / sizeof(GLfloat), GL_FLOAT, GL_FALSE, sizeof(Structures::Vertex), (void*)(unsigned long)offset);
 					offset += length[array_id];
 				}
 
@@ -281,10 +281,27 @@ namespace Starclock
 				glUniformMatrix4fv(model_matrix_id, 1, GL_FALSE, &entity->matrix[0][0]);
 
 				//Find the uniform lighting vector, then assign it
-				GLuint light_vector_id = glGetUniformLocation(shaders->gl_id, "LIGHT_VECTOR");
-				glm::vec4 light_vector(sin((float)this->tick / 100), cos((float)this->tick / 100), -0.5, 0.25);
-				light_vector = glm::vec4(1.0, 1.0, -0.5, 0.35);
-				glUniform4fv(light_vector_id, 1, &light_vector[0]);
+				glm::vec4 light_vector_array[16];
+				glm::vec4 light_colour_array[16];
+
+				//Light
+				light_vector_array[0] = glm::vec4(1.0, 1.0, -1.0, 0.0);
+				light_colour_array[0] = glm::vec4(0.8, 0.8, 1.0, 0.25);
+
+				for (int count = 0; count < 1; count ++)
+				{
+					glUniform4fv(glGetUniformLocation(shaders->gl_id, "LIGHT_VECTOR"), 16 * 3, &light_vector_array[0].x);
+				}
+
+				for (int count = 0; count < 1; count ++)
+				{
+					glUniform4fv(glGetUniformLocation(shaders->gl_id, "LIGHT_COLOUR"), 16 * 3, &light_colour_array[0].x);
+				}
+
+				//GLuint light_vector_id = glGetUniformLocation(shaders->gl_id, "LIGHT_VECTOR");
+				//glm::vec4 light_vector(sin((float)this->tick / 100), cos((float)this->tick / 100), -0.5, 0.25);
+				//light_vector = glm::vec4(1.0, 1.0, -0.5, 0.35);
+				//glUniform4fv(light_vector_id, 1, &light_vector[0]);
 
 				//Draw the model
 				glDrawArrays(GL_TRIANGLES, 0, mesh->polygon_number * 3);

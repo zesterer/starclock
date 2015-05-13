@@ -1,4 +1,4 @@
-#version 130
+#version 300 es
 
 uniform lowp mat4 PERSPECTIVE_MATRIX;
 uniform lowp mat4 CAMERA_MATRIX;
@@ -7,6 +7,8 @@ uniform lowp vec4 LIGHT_VECTOR;
 
 //Output the final colour
 out lowp vec3 color;
+//Output the final texture position
+out lowp vec2 uv;
 
 //Get the position in space
 smooth in lowp vec4 frag_pos;
@@ -39,6 +41,7 @@ void main()
 		diffuse = min(1.0, max(0.0, dot(normalize(coord_normal).xyz, -normalize(light_vector.xyz))) + ambiance);
 
 	//----TEXTURE----
+	uv = frag_uv;
 	lowp vec3 tex;
 	if (frag_uv == vec2(-1.0, -1.0))
 		tex = vec3(1.0, 1.0, 1.0);
@@ -52,8 +55,8 @@ void main()
 
 	//----SPECULAR----
 	lowp float specular_shininess = 15.0;
-	lowp float specular_amount = 0.6;
-	lowp float specular_cap = 2.0;
+	lowp float specular_amount = 0.3;
+	lowp float specular_cap = 1.0;
 	lowp float specular = 0.0;
 	if (true) //Might be useful later
 	{
@@ -65,15 +68,12 @@ void main()
 	}
 
 	//Cartoon (cel shading) effect
-	lowp float parts = 4.0;
-	//diffuse = floor(diffuse * parts) / parts;// + 0.5 / parts;
+	lowp float parts = 6.0;
+	//diffuse = 1.0;
+	//diffuse = floor(diffuse * parts) / parts + 0.5 / parts;
 	//specular = floor(specular * parts) / parts + 0.5 / parts;
 
-	color = tex * frag_col;
-
-	color = color * (diffuse + spotlight) + (0.2 * color + 0.8) * specular;
-
-	//color = vec3(0.0, 0.0, 1.0) * length(color);
+	color = tex * frag_col * (diffuse + spotlight) + (0.2 * tex + 0.8) * specular;
 
 	//color = floor(color * parts) / parts + 0.5 / parts;
 }

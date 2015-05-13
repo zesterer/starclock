@@ -1,18 +1,18 @@
-#version 130
+#version 300 es
 
 uniform mat4 PERSPECTIVE_MATRIX;
 uniform mat4 CAMERA_MATRIX;
 uniform mat4 MODEL_MATRIX;
 
-in highp   vec3 vertex_pos;
-in lowp    vec3 vertex_col;
-in mediump vec2 vertex_uv;
-in lowp    vec3 vertex_norm;
+layout(location = 0) in highp   vec3 vertex_pos;
+layout(location = 1) in lowp    vec3 vertex_col;
+layout(location = 2) in mediump vec2 vertex_uv;
+layout(location = 3) in lowp    vec3 vertex_norm;
 
-smooth out highp   vec4 FRAG_POS;
-smooth out lowp    vec3 FRAG_COL;
-smooth out mediump vec2 FRAG_UV;
-smooth out lowp    vec4 FRAG_NORM;
+smooth out highp vec4 frag_pos;
+smooth out lowp vec3 frag_col;
+smooth out mediump vec2 frag_uv;
+smooth out lowp vec4 frag_norm;
 
 struct Vertex
 {
@@ -32,16 +32,16 @@ void main()
 
 	//Find the final position. It's a position, so w is 1.
 	gl_Position = PERSPECTIVE_MATRIX * CAMERA_MATRIX * MODEL_MATRIX * vec4(vertex.pos, 1.0);
-	FRAG_POS = CAMERA_MATRIX * MODEL_MATRIX * vec4(vertex.pos, 1.0);
+	frag_pos = CAMERA_MATRIX * MODEL_MATRIX * vec4(vertex.pos, 1.0);
 
 	//The high effect
 	//gl_Position.x += sin(gl_Position.y * 2.0) / 10.0;
 	//gl_Position.y += cos(gl_Position.x * 2.0) / 10.0;
 
 	//Find the final normal. It's a vector, so w is 0.
-	FRAG_NORM = vec4(vertex.norm, 0.0);
+	frag_norm = vec4(vertex.norm, 0.0);
 	//Set the fragment normal
-	FRAG_COL = vertex.col;
+	frag_col = vertex.col;
 	//Set the UV coordinates
-	FRAG_UV = vertex.uv;
+	frag_uv = vertex.uv;
 }

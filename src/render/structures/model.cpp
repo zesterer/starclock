@@ -41,6 +41,13 @@ namespace Starclock
 				return true;
 			}
 
+			bool Model::setMaterial(string material_id)
+			{
+				this->material_id = material_id;
+
+				return true;
+			}
+
 			void Model::buffer()
 			{
 				if (this->scene != nullptr)

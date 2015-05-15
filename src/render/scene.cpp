@@ -16,6 +16,9 @@
 #include "structures/model.h"
 #include "structures/mesh.h"
 #include "structures/texture.h"
+#include "structures/shaders.h"
+#include "structures/material.h"
+#include "structures/light.h"
 
 using namespace std;
 using namespace gl;
@@ -38,7 +41,17 @@ namespace Starclock
 			this->camera = new Camera();
 
 			///* Testing
-			this->addShadersFromFiles("primary", "../shaders/primary_vertex_shader.glsl", "../shaders/fragment_shader.glsl");
+			this->addShadersFromFiles("primary", "../shaders/vertex_shader.glsl", "../shaders/fragment_shader.glsl");
+
+			this->addLightWithData(Structures::LightType::DIRECTIONAL, glm::vec3(1.0, 1.0, -1.0), glm::vec3(0.9, 0.9, 1.0), 0.3);
+			//this->addLightWithData(Structures::LightType::DIRECTIONAL, glm::vec3(1.0, 0.0, -1.0), glm::vec3(1.0, 0.0, 0.0), 0.0);
+			//this->addLightWithData(Structures::LightType::DIRECTIONAL, glm::vec3(-1.0, 0.0, -1.0), glm::vec3(0.0, 1.0, 0.0), 0.0);
+			//this->addLightWithData(Structures::LightType::DIRECTIONAL, glm::vec3(0.0, 1.0, -1.0), glm::vec3(0.0, 0.0, 1.0), 0.0);
+
+			this->addMaterialFromData("ceramic", 15.0, 0.6, 2.0, 0b10);
+			this->addMaterialFromData("metal", 15.0, 0.6, 0.3, 0b0);
+			this->addMaterialFromData("chrome", 5.0, 0.6, 1.5, 0b0);
+			this->addMaterialFromData("soft", 1.0, 0.6, 0.0, 0b0);
 
 			this->addMeshFromOBJ("bowser", "../bowser.obj");
 			this->addMeshFromOBJ("flower", "../flower.obj");
@@ -56,13 +69,13 @@ namespace Starclock
 			this->addTextureFromBMP("yoshi", "../yoshi.bmp");
 			this->addTextureFromBMP("hog", "../chief.bmp");
 
-			this->addModelFromMeshTexture("bowser", "bowser", "bowser", "primary");
-			this->addModelFromMeshTexture("flower", "flower", "fire", "primary");
-			this->addModelFromMeshTexture("floor", "floor", "grass", "primary");
-			this->addModelFromMeshTexture("mickey", "mickey", "mickey", "primary");
-			this->addModelFromMeshTexture("trooper", "trooper", "trooper", "primary");
-			this->addModelFromMeshTexture("yoshi", "yoshi", "yoshi", "primary");
-			this->addModelFromMeshTexture("hog", "hog", "hog", "primary");
+			this->addModelFromParts("bowser", "bowser", "bowser", "primary", "ceramic");
+			this->addModelFromParts("flower", "flower", "fire", "primary", "chrome");
+			this->addModelFromParts("floor", "floor", "grass", "primary", "soft");
+			this->addModelFromParts("mickey", "mickey", "mickey", "primary", "chrome");
+			this->addModelFromParts("trooper", "trooper", "trooper", "primary", "metal");
+			this->addModelFromParts("yoshi", "yoshi", "yoshi", "primary", "chrome");
+			this->addModelFromParts("hog", "hog", "hog", "primary", "chrome");
 
 			auto bowser = this->addEntityWithModel("bowser");
 			bowser->position = glm::vec3(0.0, 5.0, 0.0);
@@ -140,12 +153,24 @@ namespace Starclock
 			return &this->entities.back();
 		}
 
-		Structures::Model* Scene::addModelFromMeshTexture(string id, string mesh_id, string texture_id, string shader_id)
+		Structures::Light* Scene::addLightWithData(Structures::LightType type, glm::vec3 position, glm::vec3 colour, GLfloat ambiance)
+		{
+			Structures::Light light;
+			light.type = type;
+			light.position = position;
+			light.colour = colour;
+			light.ambiance = ambiance;
+			this->lights.push_back(light);
+			return &this->lights.back();
+		}
+
+		Structures::Model* Scene::addModelFromParts(string id, string mesh_id, string texture_id, string shader_id, string material_id)
 		{
 			Structures::Model model(this, id);
 			model.setMesh(mesh_id);
 			model.setTexture(texture_id);
 			model.setShaders(shader_id);
+			model.setMaterial(material_id);
 			this->models.push_back(model);
 			return &this->models.back();
 		}
@@ -172,6 +197,14 @@ namespace Starclock
 			shaders.loadFromFiles(vertex_shader_file.c_str(), fragment_shader_file.c_str());
 			this->shaders.push_back(shaders);
 			return &this->shaders.back();
+		}
+
+		Structures::Material* Scene::addMaterialFromData(string id, GLfloat shininess, GLfloat specular_amount, GLfloat specular_cap, GLint effects)
+		{
+			Structures::Material material(this, id);
+			material.setFromData(shininess, specular_amount, specular_cap, effects);
+			this->materials.push_back(material);
+			return &this->materials.back();
 		}
 
 		Structures::Model* Scene::getModel(string model_id) //THIS METHOD IS TEMPORARY - the pointer will break
@@ -214,6 +247,16 @@ namespace Starclock
 			return nullptr;
 		}
 
+		Structures::Material* Scene::getMaterial(string material_id) //THIS METHOD IS TEMPORARY - the pointer will break
+		{
+			for (unsigned long count = 0; count < this->materials.size(); count ++)
+			{
+				if (this->materials[count].id == material_id)
+					return &this->materials[count];
+			}
+			return nullptr;
+		}
+
 		void Scene::update()
 		{
 			//Increment the tick
@@ -246,6 +289,7 @@ namespace Starclock
 				Structures::Mesh* mesh = this->getMesh(model->mesh_id);
 				Structures::Texture* texture = this->getTexture(model->texture_id);
 				Structures::Shaders* shaders = this->getShaders(model->shaders_id);
+				Structures::Material* material = this->getMaterial(model->material_id);
 
 				//Bind the vertex buffer
 				glBindBuffer(GL_ARRAY_BUFFER, mesh->gl_id);
@@ -268,6 +312,10 @@ namespace Starclock
 					offset += length[array_id];
 				}
 
+				//Find the tick, then assign it
+				GLuint tick_id = glGetUniformLocation(shaders->gl_id, "TICK");
+				glUniform1ui(tick_id, this->tick);
+
 				//Find the uniform camera matrix, then assign it
 				GLuint perspective_matrix_id = glGetUniformLocation(shaders->gl_id, "PERSPECTIVE_MATRIX");
 				glUniformMatrix4fv(perspective_matrix_id, 1, GL_FALSE, &this->camera->perspective_matrix[0][0]);
@@ -280,31 +328,34 @@ namespace Starclock
 				GLuint model_matrix_id = glGetUniformLocation(shaders->gl_id, "MODEL_MATRIX");
 				glUniformMatrix4fv(model_matrix_id, 1, GL_FALSE, &entity->matrix[0][0]);
 
+				//Find the material, then assign it
+				glm::vec4 material_data = glm::vec4(material->shininess, material->specular_amount, material->specular_cap, 0.0);
+				GLuint material_id = glGetUniformLocation(shaders->gl_id, "MATERIAL_DATA");
+				glUniform4fv(material_id, 1, &material_data.x);
+
+				glUniform1i(glGetUniformLocation(shaders->gl_id, "MATERIAL_EFFECTS"), material->effects);
+
 				//Find the uniform lighting vector, then assign it
 				glm::vec4 light_vector_array[16];
 				glm::vec4 light_colour_array[16];
 
-				//Light
-				light_vector_array[0] = glm::vec4(1.0, 1.0, -1.0, 0.0);
-				light_colour_array[0] = glm::vec4(0.8, 0.8, 1.0, 0.25);
-
-				for (int count = 0; count < 1; count ++)
+				for (unsigned int light = 0; light < this->lights.size(); light ++)
 				{
-					glUniform4fv(glGetUniformLocation(shaders->gl_id, "LIGHT_VECTOR"), 16 * 3, &light_vector_array[0].x);
+					Structures::Light* clight = &this->lights[light];
+
+					if (clight->type == Structures::LightType::DIRECTIONAL)
+						light_vector_array[light] = glm::vec4(clight->position, 0.0);
+					else
+						light_vector_array[light] = glm::vec4(clight->position, 1.0);
+
+					light_colour_array[light] = glm::vec4(clight->colour, clight->ambiance);
 				}
 
-				for (int count = 0; count < 1; count ++)
-				{
-					glUniform4fv(glGetUniformLocation(shaders->gl_id, "LIGHT_COLOUR"), 16 * 3, &light_colour_array[0].x);
-				}
-
-				//GLuint light_vector_id = glGetUniformLocation(shaders->gl_id, "LIGHT_VECTOR");
-				//glm::vec4 light_vector(sin((float)this->tick / 100), cos((float)this->tick / 100), -0.5, 0.25);
-				//light_vector = glm::vec4(1.0, 1.0, -0.5, 0.35);
-				//glUniform4fv(light_vector_id, 1, &light_vector[0]);
+				glUniform4fv(glGetUniformLocation(shaders->gl_id, "LIGHT_VECTOR"), 16 * 3, &light_vector_array[0].x);
+				glUniform4fv(glGetUniformLocation(shaders->gl_id, "LIGHT_COLOUR"), 16 * 3, &light_colour_array[0].x);
 
 				//Draw the model
-				glDrawArrays(GL_TRIANGLES, 0, mesh->polygon_number * 3);
+				glDrawArrays(mesh->render_mode, 0, mesh->polygon_number * 3);
 
 				//Disable all the vertex attribute arrays again
 				glDisableVertexAttribArray(0);

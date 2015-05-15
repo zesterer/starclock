@@ -30,6 +30,7 @@ namespace Starclock
 
 				public: GLuint gl_id;
 				public: GLuint polygon_number;
+				public: GLenum render_mode = GL_TRIANGLES;
 
             	public: vector<Polygon> polygons;
             	public: bool clear_on_buffer = true;

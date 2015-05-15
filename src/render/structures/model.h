@@ -31,11 +31,13 @@ namespace Starclock
 				public: string mesh_id;
 				public: string texture_id;
 				public: string shaders_id;
+				public: string material_id;
 
 				public: Model(Scene* scene, string id);
 				public: bool setMesh(string mesh_id);
 				public: bool setTexture(string texture_id);
 				public: bool setShaders(string shaders_id);
+				public: bool setMaterial(string material_id);
 				public: void buffer();
 			};
 		}

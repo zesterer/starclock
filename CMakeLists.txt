@@ -44,7 +44,7 @@ src/render/structures/model.cpp
 src/render/structures/mesh.cpp
 src/render/structures/texture.cpp
 src/render/structures/shaders.cpp
-src/render/structures/light.cpp
+src/render/structures/material.cpp
 )
 
 #Take the code and turn it into the executable

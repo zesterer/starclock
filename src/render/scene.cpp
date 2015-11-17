@@ -53,8 +53,8 @@ namespace Starclock
 			this->addMaterialFromData("chrome", 5.0, 0.6, 1.5, 0b0);
 			this->addMaterialFromData("soft", 1.0, 0.6, 0.0, 0b0);
 
-			this->addMeshFromOBJ("bowser", "../bowser.obj");
-			this->addMeshFromOBJ("flower", "../flower.obj");
+			auto mbowser = this->addMeshFromOBJ("bowser", "../bowser.obj");
+			auto mflower = this->addMeshFromOBJ("flower", "../flower.obj");
 			this->addMeshFromOBJ("floor", "../floor.obj");
 			this->addMeshFromOBJ("mickey", "../mickey.obj");
 			this->addMeshFromOBJ("trooper", "../trooper.obj");
@@ -101,9 +101,9 @@ namespace Starclock
 			mickey->rotation = glm::vec3(-M_PI / 5, M_PI / 2, 0.0);
 			mickey->update();
 
-			for (int x = 0; x < 5; x ++)
+			for (int x = 0; x < 15; x ++)
 			{
-				for (int y = 0; y < 5; y ++)
+				for (int y = 0; y < 15; y ++)
 				{
 					mickey = this->addEntityWithModel("yoshi");
 					mickey->position = glm::vec3(9.0 + 3.0 * (float)x, 9.0 + 3.0 * (float)y, 2.0);
@@ -301,7 +301,7 @@ namespace Starclock
 				glUseProgram(shaders->gl_id);
 
 				//What is the buffer array composed of?
-				int length[] = {sizeof(Structures::VertexPos), sizeof(Structures::VertexCol), sizeof(Structures::VertexTex), sizeof(Structures::VertexNorm)};
+				int length[] = {sizeof(glm::vec3), sizeof(glm::vec3), sizeof(glm::vec2), sizeof(glm::vec3)};
 
 				//Tell the shaders what different parts of the buffer mean using the above array
 				GLuint offset = 0;

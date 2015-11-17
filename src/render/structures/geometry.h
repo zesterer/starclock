@@ -5,6 +5,11 @@
 #include "glbinding/gl/gl.h"
 #include "glbinding/Binding.h"
 
+#include "glm/glm.hpp"
+#include "glm/vec3.hpp"
+#include "glm/mat4x4.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
 using namespace gl;
 
 namespace Starclock
@@ -13,32 +18,12 @@ namespace Starclock
 	{
 		namespace Structures
 		{
-			struct VertexPos
-			{
-				GLfloat x, y, z;
-			};
-
-			struct VertexCol
-			{
-				GLfloat r, g, b;
-			};
-
-			struct VertexTex
-			{
-				GLfloat x, y;
-			};
-
-			struct VertexNorm
-			{
-				GLfloat i, j, k;
-			};
-
 			struct Vertex
 			{
-				VertexPos pos;
-				VertexCol col;
-				VertexTex tex;
-				VertexNorm norm;
+				glm::vec3 pos;
+				glm::vec3 col;
+				glm::vec2 tex;
+				glm::vec3 norm;
 			};
 
 			struct Polygon

@@ -20,7 +20,7 @@ smooth in lowp vec3 FRAG_COL;
 smooth in mediump vec2 FRAG_UV;
 smooth in lowp vec4 FRAG_NORM;
 
-lowp vec4 MOD_NORM;
+//lowp vec4 MOD_NORM;
 
 
 uniform sampler2D TEXTURE_SAMPLER;
@@ -31,7 +31,7 @@ float getSpecular(vec4 vector)
 	lowp float specular_amount = MATERIAL_DATA[1];
 	lowp float specular_cap = MATERIAL_DATA[2];
 
-	vec4 cam_normal = CAMERA_MATRIX * MODEL_MATRIX * MOD_NORM;
+	vec4 cam_normal = CAMERA_MATRIX * MODEL_MATRIX * FRAG_NORM;
 
 	lowp vec3 N = normalize((cam_normal).xyz);
 	lowp vec3 L = normalize((CAMERA_MATRIX * vector).xyz);
@@ -45,7 +45,7 @@ float getSpecular(vec4 vector)
 
 float getDiffuse(vec4 vector, float ambiance)
 {
-	return min(1.0, max(ambiance, dot(normalize(MODEL_MATRIX * MOD_NORM).xyz, -normalize(vector.xyz))));
+	return min(1.0, max(ambiance, dot(normalize(MODEL_MATRIX * FRAG_NORM).xyz, -normalize(vector.xyz))));
 }
 
 vec3 getTexture()
@@ -123,22 +123,22 @@ void main()
 	lowp vec3 diffuse = vec3(0.0, 0.0, 0.0);
 
 	//Initialise the normal
-	MOD_NORM = FRAG_NORM;
+	//MOD_NORM = FRAG_NORM;
 
 	//Get the texture colour
 	vec3 tex = getTexture();
 
-	if (getEffect(1) || true)
+	if (getEffect(1) && false)
 	{
 		vec4 norm = vec4(0.0, 0.0, 0.0, 0.0);
 		vec3 pos = vec3(MODEL_MATRIX * FRAG_M_POS).xyz;
 
-		float lod = min(4.0, max(1.0, -1.0 / FRAG_POS.z * 100.0));
+		float lod = min(2.0, max(1.0, -1.0 / FRAG_POS.z * 100.0));
 
 		norm.x = abs(getPerlin(vec4(pos, 1.0), 2.0, lod, 1.0));
 		norm.y = abs(getPerlin(vec4(pos, 2.0), 2.0, lod, 1.0));
 		norm.z = abs(getPerlin(vec4(pos, 3.0), 2.0, lod, 1.0));
-		MOD_NORM = normalize(MOD_NORM + norm * 0.2);
+		//FRAG_NORM = normalize(FRAG_NORM + norm * 0.2);
 	}
 
 	//Loop through all the lights
@@ -155,6 +155,12 @@ void main()
 			diffuse  += colour.xyz * getDiffuse(vector, colour.w); //Find the diffuse component
 		}
 	}
+
+	//float lod = min(3.0, max(1.0, -1.0 / FRAG_POS.z * 100.0));
+	//vec3 pos = vec3(MODEL_MATRIX * FRAG_M_POS).xyz;
+	//if (getPerlin(vec4(pos, 3.0), 2.0, lod, 1.0) < sin(float(TICK) / 200.0) * 1.5)
+		//discard;
+
 	//Cel-shading
 	if (getEffect(0))
 	{

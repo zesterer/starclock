@@ -30,6 +30,7 @@ include_directories(
 "${PROJECT_SOURCE_DIR}/src/common/"
 "${PROJECT_SOURCE_DIR}/src/render/"
 "${PROJECT_SOURCE_DIR}/src/render/structures/"
+"${PROJECT_SOURCE_DIR}/src/engine/abstract/"
 )
 
 set(SOURCE_FILES
@@ -45,6 +46,7 @@ src/render/structures/mesh.cpp
 src/render/structures/texture.cpp
 src/render/structures/shaders.cpp
 src/render/structures/material.cpp
+src/engine/abstract/world.cpp
 )
 
 #Take the code and turn it into the executable

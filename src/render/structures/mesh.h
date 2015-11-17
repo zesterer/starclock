@@ -9,6 +9,12 @@
 #include "glbinding/gl/gl.h"
 #include "glbinding/Binding.h"
 
+#include "glm/glm.hpp"
+#include "glm/vec3.hpp"
+#include "glm/mat4x4.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/detail/func_geometric.hpp"
+
 //----LOCAL----
 #include "geometry.h"
 
@@ -37,6 +43,7 @@ namespace Starclock
 
 				public: Mesh(Scene* scene, string id);
             	public: bool loadFromOBJ(string filename);
+            	public: void addMesh(Mesh* mesh, glm::mat4x4 matrix);
             	public: void buffer();
             };
 

@@ -39,12 +39,12 @@ namespace Starclock
 				//Clear the polygon vector ready for new data
 				this->polygons.clear();
 
-				vector<VertexPos> tmp_pos;
-				vector<VertexCol> tmp_col;
-				vector<VertexTex> tmp_tex;
-				vector<VertexNorm> tmp_norm;
+				vector<glm::vec3> tmp_pos;
+				vector<glm::vec3> tmp_col;
+				vector<glm::vec2> tmp_tex;
+				vector<glm::vec3> tmp_norm;
 				vector<Face> tmp_face;
-				vector<VertexNorm> new_norms;
+				vector<glm::vec3> new_norms;
 
 				//Open the file
 				ifstream file (filename);
@@ -65,8 +65,8 @@ namespace Starclock
 					//Parse the line
 					if (c_line[0] == 'v' && c_line[1] == ' ') //Deal with the vertex positions
 					{
-						VertexPos pos;
-						VertexCol col = {1.0, 1.0, 1.0}; //Default to white, just in case there is no colour data
+						glm::vec3 pos;
+						glm::vec3 col = {1.0, 1.0, 1.0}; //Default to white, just in case there is no colour data
 
 						bool matches = (sscanf(c_line, "v %f %f %f %f %f %f", &pos.x, &pos.y, &pos.z, &col.r, &col.g, &col.b) == 6);
 
@@ -80,14 +80,14 @@ namespace Starclock
 					}
 					else if (c_line[0] == 'v' && c_line[1] == 't') //Deal with the vertex UV coordinates
 					{
-						VertexTex tex = {-1.0, -1.0};
+						glm::vec2 tex = {-1.0, -1.0};
 						sscanf(c_line, "vt %f %f", &tex.x, &tex.y);
 						tmp_tex.push_back(tex);
 					}
 					else if (c_line[0] == 'v' && c_line[1] == 'n') //Deal with the vertex UV coordinates
 					{
-						VertexNorm norm = {0.0, 0.0, 0.0}; //Default to a non-existent normal
-						sscanf(c_line, "vn %f %f %f", &norm.i, &norm.j, &norm.k);
+						glm::vec3 norm; //Default to a non-existent normal
+						sscanf(c_line, "vn %f %f %f", &norm.x, &norm.y, &norm.z);
 						tmp_norm.push_back(norm);
 					}
 					else if (c_line[0] == 'f' && c_line[1] == ' ') //Deal with the vertex UV coordinates
@@ -180,22 +180,20 @@ namespace Starclock
 						if (face.a_pos == pos_id || face.b_pos == pos_id || face.c_pos == pos_id)
 						{
 							//Calculate normal
-							glm::vec3 a = glm::vec3(tmp_pos[face.a_pos - 1].x, tmp_pos[face.a_pos - 1].y, tmp_pos[face.a_pos - 1].z);
-							glm::vec3 b = glm::vec3(tmp_pos[face.b_pos - 1].x, tmp_pos[face.b_pos - 1].y, tmp_pos[face.b_pos - 1].z);
-							glm::vec3 c = glm::vec3(tmp_pos[face.c_pos - 1].x, tmp_pos[face.c_pos - 1].y, tmp_pos[face.c_pos - 1].z);
+							glm::vec3 a = tmp_pos[face.a_pos - 1];
+							glm::vec3 b = tmp_pos[face.b_pos - 1];
+							glm::vec3 c = tmp_pos[face.c_pos - 1];
 							glm::vec3 n0 = glm::cross(b - a, c - a);
 							n0 /= glm::length(n0);
-							net += glm::vec3(n0.x, n0.y, n0.z);
+							net += n0;
 
 							total += 1.0;
 						}
 					}
 
-					net /= total;
+					net = glm::normalize(net);
 
-					VertexNorm n1 = {net.x, net.y, net.z};
-
-					new_norms.push_back(n1);
+					new_norms.push_back(net);
 				}
 
 				for (unsigned long face_id = 0; face_id < tmp_face.size(); face_id ++)
@@ -223,7 +221,7 @@ namespace Starclock
 						poly.c.tex = tmp_tex[face.c_tex - 1];
 					}
 						//We got normals!
-					if ((face.has_parts & 0b00100000) == 0b00100000 && true) //If we have normal data
+					if ((face.has_parts & 0b00100000) == 0b00100000 && false) //If we have normal data
 					{
 						//poly.a.norm = new_norms[face.a_pos - 1];
 						//poly.b.norm = new_norms[face.b_pos - 1];
@@ -252,6 +250,30 @@ namespace Starclock
 				return true;
 			}
 
+			/*void Mesh::addMesh(Mesh* mesh, glm::mat4x4 matrix)
+			{
+				for (unsigned int item = 0; item < mesh->polygons.size(); item ++)
+				{
+					Polygon poly;
+					poly = mesh->polygons[item];
+
+					//Transform it
+					poly.a.pos = glm::vec3(matrix * glm::vec4(poly.a.pos, 1.0));
+					poly.b.pos = glm::vec3(matrix * glm::vec4(poly.b.pos, 1.0));
+					poly.c.pos = glm::vec3(matrix * glm::vec4(poly.c.pos, 1.0));
+
+					poly.a.norm = glm::vec3(matrix * glm::vec4(poly.a.norm, 0.0));
+					poly.b.norm = glm::vec3(matrix * glm::vec4(poly.b.norm, 0.0));
+					poly.c.norm = glm::vec3(matrix * glm::vec4(poly.c.norm, 0.0));
+
+					//Common::Out::put("Added polygon!");
+
+					this->polygons.push_back(poly);
+				}
+
+				this->buffer();
+			}*/
+
 			void Mesh::buffer()
 			{
 				//Clear any existing memory before rebuffering
@@ -272,8 +294,8 @@ namespace Starclock
 				glBufferData(GL_ARRAY_BUFFER, this->polygon_number * sizeof(Polygon), &this->polygons[0], GL_STATIC_DRAW);
 
 				//We've buffered the data, so let's clear it
-				if (this->clear_on_buffer)
-					this->polygons.clear();
+				//if (this->clear_on_buffer)
+					//this->polygons.clear();
 			}
 		}
 	}

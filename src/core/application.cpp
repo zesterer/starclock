@@ -62,9 +62,9 @@ namespace Starclock
 					this->scene->camera->position.y += 0.05 * cos(this->scene->camera->rotation.x + M_PI);
 				}
 				if (glfwGetKey(this->window->glfw_window, GLFW_KEY_M) == GLFW_PRESS)
-					this->scene->camera->position.z += 0.03;
+					this->scene->camera->position.z += 0.3;
 				if (glfwGetKey(this->window->glfw_window, GLFW_KEY_N) == GLFW_PRESS)
-					this->scene->camera->position.z -= 0.03;
+					this->scene->camera->position.z -= 0.3;
 
 				if (glfwGetKey(this->window->glfw_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 					this->scene->camera->rotation.x += 0.03;
